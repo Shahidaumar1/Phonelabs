@@ -100,4 +100,12 @@ class Modal extends Model
     {
         return ProductSpec::where('model_id', $this->id)->distinct('condition')->pluck('condition')->toArray();
     }
+
+    /**
+     * Get the route key for model binding
+     */
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }

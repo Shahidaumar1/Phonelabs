@@ -236,9 +236,10 @@
                         ]);
                     } elseif ($isQuotation) {
                         $targetUrl = route('quotation.livewire', [
-                            'device' => $device->slug,
-                            'modal'  => $modal->slug,
-                            'repair' => $r_slug,
+                            'category' => $device->category->slug ?? 'unknown',
+                            'device'   => $device->slug,
+                            'modal'    => $modal->slug,
+                            'repair'   => $r_slug,
                         ]);
                     } else {
                         $targetUrl = route('repair-detail', [

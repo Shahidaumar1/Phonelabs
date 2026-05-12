@@ -30,10 +30,8 @@
                 <div class="d-flex flex-wrap align-items-center justify-content-center my-2 gap-3">
                     @forelse($categories as $category)
                     <div class="col-md-3 mb-3 mr-4">
-                        {{-- ✅ SEO URL: /sell/phones --}}
-                        <a href="{{ route('guest-sell-device-types', [
-                            'category_slug' => $category->slug ?? \Illuminate\Support\Str::slug($category->name),
-                        ]) }}" class="card shah mb-3 mr-3">
+                        {{-- ✅ SEO URL: /sell/phone-category --}}
+                        <a href="{{ route('guest.sell.models', ['category' => $category->slug]) }}" class="card shah mb-3 mr-3">
                             <img src="{{ $category->file ?? '' }}" class="img-thumbnail" style="height:150px;">
                             <div class="icon"><i class="bi bi-tablet"></i></div>
                             <div class="card-body text-dark text-center fs-3">

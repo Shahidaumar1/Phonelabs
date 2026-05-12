@@ -34,7 +34,9 @@ use App\Http\Livewire\Guest\QuotationForm;
 
 Route::get('/repair/{category_slug}/{device_slug}/{model_slug}/{repair_slug}/free-repair-booking', FreeRepairBooking::class)
     ->name('free-repair-booking');
-Route::get('/quotation/{device}/{modal}/{repair}', QuotationForm::class)->name('quotation.livewire');
+
+// ✅ SEO Routes - Using slugs for quotation
+Route::get('/quotation/{category}/{device}/{modal}/{repair}', QuotationForm::class)->name('quotation.livewire');
 
 
 Route::get('/admin/repair/prices/print', \App\Http\Controllers\Admin\Repair\RepairPrintController::class)
@@ -43,14 +45,15 @@ Route::get('/admin/repair/prices/print', \App\Http\Controllers\Admin\Repair\Repa
 // Sell ka main page (navbar se yahi open hoga)
 Route::get('/sell', Categories::class)->name('guest.sell.categories');
 
-// Neeche wale optional hain, agar step-by-step pages chala raha hai:
-
-Route::get('/sell/device-types/{category}', Models::class)
+// ✅ SEO URLs - Using slugs instead of IDs
+Route::get('/sell/{category}', Models::class)
     ->name('guest.sell.models');
+
 Route::get('/repairguide', function () {
     return view('repairguide');
 })->name('repair-guide');
-Route::get('/sell/model/{model}', ModelDetail::class)
+
+Route::get('/sell/model/{modal}', ModelDetail::class)
     ->name('guest.sell.model-detail');
 
 Route::get('/sell/product-specs/{product}', ProductSpecs::class)

@@ -4,6 +4,10 @@ use Livewire\Component;
 use App\Models\QuotationRequest;
 use App\Models\SiteSetting;
 use App\Models\NewsletterSubscriber;
+use App\Models\Category;
+use App\Models\DeviceType;
+use App\Models\Modal;
+use App\Models\RepairType;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\DB;
 
@@ -12,16 +16,42 @@ class QuotationForm extends Component
     public $device;
     public $modal;
     public $repair;
+    public $deviceName;
+    public $modalName;
+    public $repairName;
     public $name;
     public $email;
     public $phone;
     public $message;
 
-    public function mount($device, $modal, $repair)
+    // ✅ UPDATED: mount method now accepts slugs instead of IDs
+    public function mount($category, $device, $modal, $repair)
     {
-        $this->device = $device;
-        $this->modal  = $modal;
-        $this->repair = urldecode($repair);
+        // Resolve category slug to find the category
+        $categoryModel = Category::where('slug', $category)->firstOrFail();
+        
+        // Resolve device slug to find the device type
+        $deviceModel = DeviceType::where('slug', $device)
+            ->where('category_id', $categoryModel->id)
+            ->firstOrFail();
+        
+        // Resolve modal slug to find the modal
+        $modalModel = Modal::where('slug', $modal)
+            ->where('device_type_id', $deviceModel->id)
+            ->firstOrFail();
+        
+        // Resolve repair slug to find the repair type
+        $repairModel = RepairType::where('slug', $repair)->firstOrFail();
+
+        // Store IDs for database
+        $this->device = $deviceModel->id;
+        $this->modal = $modalModel->id;
+        $this->repair = $repairModel->id;
+
+        // Store names for display
+        $this->deviceName = $deviceModel->name;
+        $this->modalName = $modalModel->name;
+        $this->repairName = $repairModel->name;
     }
 
     protected $rules = [
@@ -39,9 +69,9 @@ class QuotationForm extends Component
         $businessName = $siteSettings->business_name ?? 'QuickFix Mobiles';
 
         QuotationRequest::create([
-            'device'  => $this->device,
-            'modal'   => $this->modal,
-            'repair'  => $this->repair,
+            'device'  => $this->deviceName,
+            'modal'   => $this->modalName,
+            'repair'  => $this->repairName,
             'name'    => $this->name,
             'email'   => $this->email,
             'phone'   => $this->phone,
@@ -58,9 +88,9 @@ class QuotationForm extends Component
 
         $emailBody = "
 New Quotation Request
-Device: {$this->device}
-Model: {$this->modal}
-Repair: {$this->repair}
+Device: {$this->deviceName}
+Model: {$this->modalName}
+Repair: {$this->repairName}
 Name: {$this->name}
 Email: {$this->email}
 Phone: {$this->phone}

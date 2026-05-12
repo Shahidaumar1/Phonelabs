@@ -5,29 +5,42 @@ namespace App\Http\Livewire\Guest\Sell;
 use App\Helpers\Status;
 use App\Models\Category;
 use App\Models\DeviceType;
+use App\Models\Modal;
 use Livewire\Component;
 
 class Models extends Component
 {
-    public $device;
     public $category;
+    public $device;
     public $models = [];
 
-    // ✅ UPDATED: device_id ki jagah category_slug + device_slug use hoga
-    public function mount($category_slug, $device_slug)
+    // ✅ UPDATED: Using category slug from URL
+    public function mount($category)
     {
-        // Category slug se category find karo
-        $this->category = Category::where('slug', $category_slug)->firstOrFail();
+        // If $category is a Category instance (model binding), use it directly
+        if ($category instanceof Category) {
+            $this->category = $category;
+        } else {
+            // Otherwise try to find by slug
+            $this->category = Category::where('slug', $category)->firstOrFail();
+        }
 
-        // Device slug se device find karo
-        $this->device = DeviceType::where('slug', $device_slug)
-            ->where('category_id', $this->category->id)
-            ->firstOrFail();
-
-        $this->models = $this->device->modals()
+        // Get the first device type for this category (or you could accept it as a parameter too)
+        // This is a default behavior - adjust as needed
+        $this->device = $this->category->devices()
             ->where('status', Status::PUBLISH)
-            ->orderBy('order_by', 'asc')
-            ->get();
+            ->first();
+
+        if (!$this->device) {
+            $this->device = new DeviceType(['name' => 'Devices', 'slug' => 'devices']);
+        }
+
+        $this->models = Modal::whereHas('device_type', function ($query) {
+            $query->where('category_id', $this->category->id);
+        })
+        ->where('status', Status::PUBLISH)
+        ->orderBy('order_by', 'asc')
+        ->get();
     }
 
     public function render()
