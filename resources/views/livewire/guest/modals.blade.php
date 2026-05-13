@@ -478,7 +478,7 @@
             <!-- model grid -->
             <div class="device-brands" id="deviceBrandsContainer">
                 @forelse($modals as $key => $modal)
-                    <a href="{{ route('repair-types', ['device' => $device->id, 'modal' => $modal->id]) }}" class="deviceBrand-link">
+                    <a href="{{ route('repair-types', ['device' => $device->slug, 'modal' => $modal->slug]) }}" class="deviceBrand-link">
                         <div class="deviceBrand-box">
                             <figure>
                                 <img src="{{ $modal->file ?? '' }}" alt="{{ $modal->name }}" class="img-fluid" loading="lazy">

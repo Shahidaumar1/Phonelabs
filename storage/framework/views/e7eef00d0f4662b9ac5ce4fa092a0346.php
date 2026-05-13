@@ -289,9 +289,9 @@ echo $html;
                 <?php $__empty_1 = true; $__currentLoopData = $categories; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $category): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <?php if($category->name != 'Apple iPad' && $cardCount < 4): ?>
                         <?php $cardCount++; ?>
-                        <div class="deviceType-box" onclick="window.location.href='<?php echo e(route('device-types', $category->id)); ?>'">
+                        <div class="deviceType-box" onclick="window.location.href='<?php echo e(route('device-types', $category->slug)); ?>'">
                             <figure><img src="<?php echo e($category->file ?? ''); ?>" alt="<?php echo e($category->name); ?>"></figure>
-                            <a href="<?php echo e(route('device-types', $category->id)); ?>"><?php echo e($category->name); ?></a>
+                            <a href="<?php echo e(route('device-types', $category->slug)); ?>"><?php echo e($category->name); ?></a>
                         </div>
                     <?php endif; ?>
                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>

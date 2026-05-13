@@ -187,8 +187,9 @@
 <body>
 
 @php
-    $deviceSeo = App\Helpers\SeoUrl::encodeUrl($device->name ?? 'device');
-    $modelSeo  = App\Helpers\SeoUrl::encodeUrl($modal->name ?? 'model');
+    // ✅ Use slugs instead of encoding URL names
+    $deviceSlug = $device->slug ?? '';
+    $modalSlug = $modal->slug ?? '';
 @endphp
   <livewire:components.top-bar />
     <livewire:components.mega-nav theme="white" />
@@ -211,8 +212,6 @@
 
                     $priceAmount = $priceRecord ? (float) $priceRecord->price : 0;
 
-                    $repairSeo = App\Helpers\SeoUrl::encodeUrl($repair_type->name);
-
                     $r_slug = !empty($repair_type->slug)
                         ? $repair_type->slug
                         : \Illuminate\Support\Str::slug($repair_type->name);
@@ -229,23 +228,23 @@
                     // Target URL
                     if ($isFreeBooking) {
                         $targetUrl = route('free-repair-booking', [
-                            'category_slug' => $category->slug ?? '',
-                            'device_slug'   => $device->slug,
-                            'model_slug'    => $modal->slug,
+                            'category_slug' => $device->category->slug ?? '',
+                            'device_slug'   => $deviceSlug,
+                            'model_slug'    => $modalSlug,
                             'repair_slug'   => $r_slug,
                         ]);
                     } elseif ($isQuotation) {
                         $targetUrl = route('quotation.livewire', [
                             'category' => $device->category->slug ?? 'unknown',
-                            'device'   => $device->slug,
-                            'modal'    => $modal->slug,
+                            'device'   => $deviceSlug,
+                            'modal'    => $modalSlug,
                             'repair'   => $r_slug,
                         ]);
                     } else {
                         $targetUrl = route('repair-detail', [
-    'device' => $deviceSeo,
-    'modal'  => $modelSeo,
-    'repair' => $repairSeo,
+    'device' => $deviceSlug,
+    'modal'  => $modalSlug,
+    'repair' => $r_slug,
 ]) . '?price=' . $priceAmount;
                     }
 
