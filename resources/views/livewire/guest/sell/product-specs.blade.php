@@ -319,7 +319,7 @@ $args = 'Publish';
                                     </div>
                                     @endforeach
                                     @if($nav_devices_count > $nav_devices->count())
-                                    <li><a href="{{ route('device-types', $category->id) }}"><span class="btn text-dark fw-bolder" style="font-size:13px">See
+                                    <li><a href="{{ route('device-types', $category->slug) }}"><span class="btn text-dark fw-bolder" style="font-size:13px">See
                                                 more</span></a></li>
                                     @endif
                                 </div>
@@ -349,7 +349,7 @@ $args = 'Publish';
                     @foreach($nav_categories as $category)
 
                     <li>
-                        <a href="{{ route('guest-sell-device-types', $category->id) }}" class="text-black  " style="display: block; font-size: 14px; padding:0px 50px"> {{ $category->name }} <i class="bi bi-chevron-down ml-2 fs-5"></i>
+                        <a href="{{ route('guest-sell-device-types', $category->slug) }}" class="text-black  " style="display: block; font-size: 14px; padding:0px 50px"> {{ $category->name }} <i class="bi bi-chevron-down ml-2 fs-5"></i>
                         </a>
 
 
@@ -394,7 +394,7 @@ $args = 'Publish';
                                 @endforeach
 
                                 @if($nav_devices_count > $nav_devices->count())
-                                <li><a href="{{ route('guest-sell-device-types', $category->id) }}"><span class="btn text-dark fw-bolder" style="font-size:13px">See all Devices
+                                <li><a href="{{ route('guest-sell-device-types', $category->slug) }}"><span class="btn text-dark fw-bolder" style="font-size:13px">See all Devices
                                         </span></a></li>
                                 @endif
                             </div>
@@ -864,7 +864,7 @@ $args = 'Publish';
                                         @endforeach
                                         @if($nav_devices_count > $nav_devices->count())
                                         <li>
-                                            <a href="{{ route('guest-sell-device-types', $category->id) }}">
+                                            <a href="{{ route('guest-sell-device-types', $category->slug) }}">
                                                 <span class="btn text-dark fw-bolder" style="font-size: 13px;">See all Devices</span>
                                             </a>
                                         </li>
@@ -1104,7 +1104,7 @@ $args = 'Publish';
                                         </div>
                                         @endforeach
                                         @if($nav_devices_count > $nav_devices->count())
-                                        <li><a href="{{ route('device-types', $category->id) }}"><span class="btn text-dark fw-bolder" style="font-size:13px">See more</span></a></li>
+                                        <li><a href="{{ route('device-types', $category->slug) }}"><span class="btn text-dark fw-bolder" style="font-size:13px">See more</span></a></li>
                                         @endif
                                     </div>
                                 </ul>

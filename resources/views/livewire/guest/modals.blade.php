@@ -452,7 +452,7 @@
                 <ol class="breadcrumb breadcrumb-custom">
                     <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
                     <li class="breadcrumb-item"><a href="{{ route('categories') }}">Device Type</a></li>
-                    <li class="breadcrumb-item"><a href="{{ route('device-types', $device->category_id ?? null) }}">Brands</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('device-types', $device->category->slug ?? null) }}">Brands</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Models</li>
                 </ol>
             </nav>

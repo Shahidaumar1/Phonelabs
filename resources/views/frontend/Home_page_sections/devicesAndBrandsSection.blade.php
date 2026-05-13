@@ -146,7 +146,7 @@
     </section>
 
     <div class="services-grid">
-        <a href="/device-types/4" class="repair-card card-light">
+        <a href="{{ route('device-types', 'mobile-phone') }}" class="repair-card card-light">
             <div class="video-container-wrapper">
                 <div class="inner-screen">
                     <video autoplay loop muted playsinline>
@@ -163,7 +163,7 @@
             </div>
         </a>
 
-        <a href="/device-types/10" class="repair-card card-dark">
+        <a href="{{ route('device-types', 'computing') }}" class="repair-card card-dark">
             <div class="video-container-wrapper">
                 <div class="inner-screen">
                     <video autoplay loop muted playsinline>
@@ -180,7 +180,7 @@
             </div>
         </a>
 
-        <a href="/device-types/11" class="repair-card card-light">
+        <a href="{{ route('device-types', 'tablet-devices') }}" class="repair-card card-light">
             <div class="video-container-wrapper">
                 <div class="inner-screen">
                     <video autoplay loop muted playsinline>

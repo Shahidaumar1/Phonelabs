@@ -275,9 +275,9 @@
                 @forelse($categories as $category)
                     @if ($category->name != 'Apple iPad' && $cardCount < 4)
                         @php $cardCount++; @endphp
-                        <div class="deviceType-box" onclick="window.location.href='{{ route('device-types', $category->id) }}'">
+                        <div class="deviceType-box" onclick="window.location.href='{{ route('device-types', $category->slug) }}'">
                             <figure><img src="{{ $category->file ?? '' }}" alt="{{ $category->name }}"></figure>
-                            <a href="{{ route('device-types', $category->id) }}">{{ $category->name }}</a>
+                            <a href="{{ route('device-types', $category->slug) }}">{{ $category->name }}</a>
                         </div>
                     @endif
                 @empty
