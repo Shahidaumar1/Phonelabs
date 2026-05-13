@@ -78,18 +78,19 @@ public function mount()
         ->groupBy('device_type_id')
         ->select('device_type_id')
         ->with(['deviceType' => function ($query) {
-            $query->select('id', 'name');
+            $query->select('id', 'name', 'slug');
         }])
         ->limit(5) // Limit to 5 device types for Repair
         ->get()
         ->mapWithKeys(function ($category) {
             return [$category->device_type_id => [
                 'name' => $category->deviceType->name,
+                'slug' => $category->deviceType->slug,
                 'items' => Modal::where('device_type_id', $category->device_type_id)
                     ->where('service', 'Repair')
                     ->where('status', 'Publish')
                     ->take(10)
-                    ->get(['id', 'name'])
+                    ->get(['id', 'name', 'slug'])
             ]];
         });
 }

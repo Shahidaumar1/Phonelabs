@@ -289,7 +289,7 @@ $args = 'Publish';
                                     <div class=" d-flex flex-column mx-2 mt-3" style="">
 
                                         <li class="d-flex justify-content-center">
-                                            <a href="{{ route('modals', $device->id) }}" style="color: black; white-space: normal; line-height: normal; height: auto; display: block; text-align: left;">
+                                            <a href="{{ route('modals', $device->slug) }}" style="color: black; white-space: normal; line-height: normal; height: auto; display: block; text-align: left;">
                                                 <strong>{{ $device->name }}</strong>
                                             </a>
                                         </li>
@@ -306,13 +306,13 @@ $args = 'Publish';
                                         @foreach($nav_models as $nav_model)
 
                                         <li>
-                                            <a href="{{ route('repair-types', ['device' => $device->id, 'modal' => $nav_model->id]) }}" style="color: black;line-height: normal;height: auto;">{{ $nav_model->name }}</a>
+                                            <a href="{{ route('repair-types', ['device' => $device->slug, 'modal' => $nav_model->slug]) }}" style="color: black;line-height: normal;height: auto;">{{ $nav_model->name }}</a>
                                         </li>
                                         <li class="mx-auto" style="width:90%"></li>
                                         @endforeach
 
                                         @if($nav_models_count > $nav_models->count())
-                                        <li><a href="{{ route('modals', $device->id) }}" style="line-height: normal;height: auto;padding:1px;"><span class="btn text-dark fw-bolder" style="font-size:13px">See
+                                        <li><a href="{{ route('modals', $device->slug) }}" style="line-height: normal;height: auto;padding:1px;"><span class="btn text-dark fw-bolder" style="font-size:13px">See
                                                     more</span></a></li>
 
                                         @endif
@@ -1084,7 +1084,7 @@ $args = 'Publish';
                                         @php $deviceId = 'repair_device_' . $device->id; @endphp
                                         <div class="mt-3">
                                             <li class="">
-                                                <a href="{{ route('modals', $device->id) }}" style="color: black; white-space: normal; ">
+                                                <a href="{{ route('modals', $device->slug) }}" style="color: black; white-space: normal; ">
                                                     <strong>{{ $device->name }}</strong>
                                                 </a>
                                             </li>
@@ -1094,12 +1094,12 @@ $args = 'Publish';
                                             @endphp
                                             @foreach($nav_models as $nav_model)
                                             <li>
-                                                <a href="{{ route('repair-types', ['device' => $device->id, 'modal' => $nav_model->id]) }}" style="color: black;line-height: normal;height: auto;">{{ $nav_model->name }}</a>
+                                                <a href="{{ route('repair-types', ['device' => $device->slug, 'modal' => $nav_model->slug]) }}" style="color: black;line-height: normal;height: auto;">{{ $nav_model->name }}</a>
                                             </li>
                                             <li class="mx-auto" style="width:90%"></li>
                                             @endforeach
                                             @if($nav_models_count > $nav_models->count())
-                                            <li><a href="{{ route('modals', $device->id) }}" style="line-height: normal;height: auto;padding:1px;"><span class="btn text-dark fw-bolder" style="font-size:13px">See more</span></a></li>
+                                            <li><a href="{{ route('modals', $device->slug) }}" style="line-height: normal;height: auto;padding:1px;"><span class="btn text-dark fw-bolder" style="font-size:13px">See more</span></a></li>
                                             @endif
                                         </div>
                                         @endforeach

@@ -39,8 +39,8 @@
                 <div class="d-flex gap-2 flex-wrap justify-content-center white-cards ">
                     @foreach ($modals as $modal)
                         @php
-                            $d = App\Helpers\SeoUrl::encodeUrl($selectedDeviceType->name);
-                            $m = App\Helpers\SeoUrl::encodeUrl($modal->name);
+                            $d = $selectedDeviceType->slug;
+                            $m = $modal->slug;
                         @endphp
 
                         <div class="card">

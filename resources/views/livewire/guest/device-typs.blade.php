@@ -245,7 +245,7 @@
             <div class="d10-grid">
                 @forelse($device_types as $device_type)
                     @if ($device_type->name != 'Apple iPad')
-                    <div class="d10-card" onclick="window.location.href='{{ route('modals', $device_type->id) }}'">
+                    <div class="d10-card" onclick="window.location.href='{{ route('modals', $device_type->slug) }}'">
                         <div class="d10-inner">
                             <div class="d10-front">
                                 <h3>{{ $device_type->name }}</h3>

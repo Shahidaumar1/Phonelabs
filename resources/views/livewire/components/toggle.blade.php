@@ -101,13 +101,13 @@ $branches = Branch::all();
                     <a class="text-dark fw-bolder" href="#">Book A Repair <b class="separator"> | </b></a>
                     <div class="mega-menu">
                         @php
-                $limitedCategories = collect($sellCategories)->take(3); // Limit to 3 categories
+                $limitedCategories = collect($repairCategories)->take(3); // Limit to 3 categories
             @endphp
                         
                           @foreach($limitedCategories as $categoryId => $category)
                             <div class="menu-column">
                                 <p>
-                                    <a href="{{ route('modals', ['device' => $categoryId]) }}"  class="fw-bolder">
+                                    <a href="{{ route('modals', ['device' => $category['slug']]) }}"  class="fw-bolder">
                                         {{ $category['name'] }}
                                     </a>
                                 </p>
@@ -115,12 +115,12 @@ $branches = Branch::all();
                                     $items = collect($category['items'])->take(5); // Limit to 5 items
                                 @endphp
                                 @foreach($items as $item)
-                                    <a href="{{ route('repair-types', ['device' => $categoryId, 'modal' => $item->id]) }}"style="font-size:16px !important ;">
+                                    <a href="{{ route('repair-types', ['device' => $category['slug'], 'modal' => $item->slug]) }}"style="font-size:16px !important ;">
                                         {{ $item->name }}
                                     </a>
                                 @endforeach
                                 @if (count($category['items']) > 5)
-                                    <a href="{{ route('modals', ['device' => $categoryId]) }}" class="btn text-dark fw-bolder" style="margin-left:-10px !important;font-size: 16px; text-align: left; color: #db3444 !important; ">
+                                    <a href="{{ route('modals', ['device' => $category['slug']]) }}" class="btn text-dark fw-bolder" style="margin-left:-10px !important;font-size: 16px; text-align: left; color: #db3444 !important; ">
                                         See More
                                     </a>
                                 @endif

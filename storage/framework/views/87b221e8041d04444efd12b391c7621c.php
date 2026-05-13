@@ -466,7 +466,7 @@ echo $html;
                 <ol class="breadcrumb breadcrumb-custom">
                     <li class="breadcrumb-item"><a href="<?php echo e(route('home')); ?>">Home</a></li>
                     <li class="breadcrumb-item"><a href="<?php echo e(route('categories')); ?>">Device Type</a></li>
-                    <li class="breadcrumb-item"><a href="<?php echo e(route('device-types', $device->category_id ?? null)); ?>">Brands</a></li>
+                    <li class="breadcrumb-item"><a href="<?php echo e(route('device-types', $device->category->slug ?? null)); ?>">Brands</a></li>
                     <li class="breadcrumb-item active" aria-current="page">Models</li>
                 </ol>
             </nav>
@@ -492,7 +492,7 @@ echo $html;
             <!-- model grid -->
             <div class="device-brands" id="deviceBrandsContainer">
                 <?php $__empty_1 = true; $__currentLoopData = $modals; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $modal): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                    <a href="<?php echo e(route('repair-types', ['device' => $device->id, 'modal' => $modal->id])); ?>" class="deviceBrand-link">
+                    <a href="<?php echo e(route('repair-types', ['device' => $device->slug, 'modal' => $modal->slug])); ?>" class="deviceBrand-link">
                         <div class="deviceBrand-box">
                             <figure>
                                 <img src="<?php echo e($modal->file ?? ''); ?>" alt="<?php echo e($modal->name); ?>" class="img-fluid" loading="lazy">

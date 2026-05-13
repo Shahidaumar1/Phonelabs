@@ -259,7 +259,7 @@ echo $html;
             <div class="d10-grid">
                 <?php $__empty_1 = true; $__currentLoopData = $device_types; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $device_type): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                     <?php if($device_type->name != 'Apple iPad'): ?>
-                    <div class="d10-card" onclick="window.location.href='<?php echo e(route('modals', $device_type->id)); ?>'">
+                    <div class="d10-card" onclick="window.location.href='<?php echo e(route('modals', $device_type->slug)); ?>'">
                         <div class="d10-inner">
                             <div class="d10-front">
                                 <h3><?php echo e($device_type->name); ?></h3>
