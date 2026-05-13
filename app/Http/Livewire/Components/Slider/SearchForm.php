@@ -41,9 +41,9 @@ class SearchForm extends Component
     public function Go()
     {
 
-
-        $d = SeoUrl::encodeUrl($this->device_type->name);
-        $m = SeoUrl::encodeUrl($this->modal->name);
+        // ✅ Use slugs instead of encoded URL names
+        $d = $this->device_type->slug;
+        $m = $this->modal->slug;
         return redirect()->route('repair-types', ['device' => $d, 'modal' => $m]);
     }
     public function render()

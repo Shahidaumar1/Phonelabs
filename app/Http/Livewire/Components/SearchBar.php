@@ -165,8 +165,8 @@ class SearchBar extends Component
         $deviceType = DeviceType::find($id);
 
         if ($deviceType) {
-            Log::info('Device type found. Device ID: ' . $deviceType->id);
-            return redirect()->route('modals', ['device' => $deviceType->id]);
+            Log::info('Device type found. Device slug: ' . $deviceType->slug);
+            return redirect()->route('modals', ['device' => $deviceType->slug]);
         } else {
             Log::warning('Device type not found for ID ' . $id);
             abort(404);
@@ -174,13 +174,13 @@ class SearchBar extends Component
     } elseif ($type === 'modal') {
         $modal = Modal::with('deviceType')->find($id);
         if ($modal) {
-            $deviceTypeId = $modal->deviceType ? $modal->deviceType->id : null;
+            $deviceTypeSlug = $modal->deviceType ? $modal->deviceType->slug : null;
 
-            if (!is_null($deviceTypeId)) {
-                Log::info('Redirecting to repair-types. Device ID: ' . $deviceTypeId . ', Modal ID: ' . $modal->id);
-                return redirect()->route('repair-types', ['device' => $deviceTypeId, 'modal' => $modal->id]);
+            if (!is_null($deviceTypeSlug)) {
+                Log::info('Redirecting to repair-types. Device slug: ' . $deviceTypeSlug . ', Modal slug: ' . $modal->slug);
+                return redirect()->route('repair-types', ['device' => $deviceTypeSlug, 'modal' => $modal->slug]);
             } else {
-                Log::warning('Empty device type ID for Modal ID ' . $id);
+                Log::warning('Empty device type slug for Modal ID ' . $id);
                 abort(404);
             }
         } else {
@@ -193,15 +193,15 @@ class SearchBar extends Component
             // Store the price in the session
             session(['repair_price' => $price->price]);
 
-            $modalId = SeoUrl::encodeUrl($price->modal->name);
-            $deviceTypeId = SeoUrl::encodeUrl($price->modal->deviceType->name);
-            $repairTypeId = SeoUrl::encodeUrl($price->repairType->name);
+            $modalSlug = $price->modal->slug;
+            $deviceTypeSlug = $price->modal->deviceType->slug;
+            $repairTypeSlug = $price->repairType->slug;
 
-            if (!is_null($deviceTypeId) && !is_null($modalId) && !is_null($repairTypeId)) {
-                Log::info('Redirecting to repair detail. Device ID: ' . $deviceTypeId . ', Modal ID: ' . $modalId . ', Repair Type ID: ' . $repairTypeId);
-                return redirect()->route('repair-detail', ['device' => $deviceTypeId, 'modal' => $modalId, 'repair' => $repairTypeId]);
+            if (!is_null($deviceTypeSlug) && !is_null($modalSlug) && !is_null($repairTypeSlug)) {
+                Log::info('Redirecting to repair detail. Device slug: ' . $deviceTypeSlug . ', Modal slug: ' . $modalSlug . ', Repair Type slug: ' . $repairTypeSlug);
+                return redirect()->route('repair-detail', ['device' => $deviceTypeSlug, 'modal' => $modalSlug, 'repair' => $repairTypeSlug]);
             } else {
-                Log::warning('Empty device, modal, or repair type ID for Price ID ' . $id);
+                Log::warning('Empty device, modal, or repair type slug for Price ID ' . $id);
                 abort(404);
             }
         } else {
