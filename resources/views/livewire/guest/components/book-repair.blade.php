@@ -262,9 +262,9 @@
 
                         <p>{{ $landline_number }}</p>
 
-                        <button class="btn submit-btn mt-3"
-    data-bs-toggle="modal"
-    onclick="callBookRepair()"
+                        <button type="button" class="btn submit-btn mt-3"
+    wire:click="BookRepair"
+    wire:loading.attr="disabled"
     style="
         border:1px solid #00AEEF;
         width:120px;
@@ -272,7 +272,8 @@
         background:#00AEEF;
         color:#fff;
     ">
-    Submit
+    <span wire:loading.remove wire:target="BookRepair">Submit</span>
+    <span wire:loading wire:target="BookRepair">Submitting...</span>
 </button>
                      
 
@@ -442,8 +443,9 @@
                     --}}
                     <button type="button"
                         class="btn btn-primary"
-                        onclick="callBookRepair()"
-                        data-bs-dismiss="modal">
+                        wire:click="BookRepair"
+                        data-bs-dismiss="modal"
+                        wire:loading.attr="disabled">
                         Confirm
                     </button>
                 </div>
@@ -452,19 +454,8 @@
     </div>
 
     <script>
-        // Store this component's Livewire ID so we can target it directly
-        // @this.id gives the current component's wire:id — always correct
+        // Store this component's Livewire ID for reference
         window.bookRepairComponentId = '{{ $this->id }}';
-
-        function callBookRepair() {
-            // Find this exact component instance and call BookRepair on it
-            var component = window.livewire.find(window.bookRepairComponentId);
-            if (component) {
-                component.call('BookRepair');
-            } else {
-                console.error('BookRepair component not found. ID:', window.bookRepairComponentId);
-            }
-        }
     </script>
 
 </div>
