@@ -55,7 +55,9 @@
 </a>
 @endif
 </body>
-
+   <!--AI CHATBOT (Dynamic — Database se)-->
+   
+    @include('frontend.partials.chatbot_dynamic')
 @include('frontend.sections.script')
 
 </html>

@@ -32,6 +32,27 @@ use App\Http\Livewire\Guest\Sell\BookingForm;
 use App\Http\Livewire\Guest\FreeRepairBooking;
 use App\Http\Livewire\Guest\QuotationForm;
 
+Route::get('/chatbot/debug-brands/{catId}', function($catId) {
+    $all = DB::table('device_types')
+        ->where('category_id', $catId)
+        ->get(['id', 'name', 'service', 'status', 'deleted_at']);
+    return response()->json($all);
+});
+
+//chatbot
+use App\Http\Controllers\ChatbotController;
+Route::get('/chatbot/brands',  [ChatbotController::class, 'brands']);
+Route::get('/chatbot/models',  [ChatbotController::class, 'models']);
+Route::get('/chatbot/repairs', [ChatbotController::class, 'repairs']);
+
+ 
+// Buy routes 
+Route::get('/chatbot/buy-categories', [ChatbotController::class, 'buyCategories']);
+Route::get('/chatbot/buy-brands',     [ChatbotController::class, 'buyBrands']);
+Route::get('/chatbot/buy-models',     [ChatbotController::class, 'buyModels']);
+Route::get('/chatbot/buy-specs',      [ChatbotController::class, 'buySpecs']);
+
+
 Route::get('/repair/{category_slug}/{device_slug}/{model_slug}/{repair_slug}/free-repair-booking', FreeRepairBooking::class)
     ->name('free-repair-booking');
 

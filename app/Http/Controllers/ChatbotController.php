@@ -1,0 +1,330 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+
+class ChatbotController extends Controller
+{
+    // ═══════════════════════════════════════════════════════════
+    //  REPAIR FLOW
+    // ═══════════════════════════════════════════════════════════
+
+    /** GET /chatbot/brands?category_id=4 */
+    public function brands(Request $request)
+    {
+        $catId = $request->category_id;
+
+        $brands = DB::table('device_types')
+            ->where('category_id', $catId)
+            ->where('service', 'Repair')
+            ->where('status', 'Publish')
+            ->whereNull('deleted_at')
+            ->select('id', 'name', 'slug')
+            ->orderBy('sort_order')
+            ->get()
+            ->map(function ($b) {
+                $b->icon = $this->brandIcon($b->name);
+                return $b;
+            });
+
+        return response()->json($brands);
+    }
+
+    /** GET /chatbot/models?brand_id=4 */
+    public function models(Request $request)
+    {
+        $brandId = $request->brand_id;
+
+        $models = DB::table('modals')
+            ->where('device_type_id', $brandId)
+            ->where('service', 'Repair')
+            ->where('status', 'Publish')
+            ->whereNull('deleted_at')
+            ->select('id', 'name', 'slug')
+            ->orderBy('order_by')
+            ->orderBy('name')
+            ->get()
+            ->map(function ($m) {
+                $m->slug = $this->cleanSlug($m->slug, $m->name);
+                return $m;
+            });
+
+        return response()->json($models);
+    }
+
+    /** GET /chatbot/repairs?model_id=123 */
+    public function repairs(Request $request)
+    {
+        $modelId = $request->model_id;
+
+        // Model info
+        $modal     = DB::table('modals')->where('id', $modelId)->first();
+        $modalSlug = $modal ? $this->cleanSlug($modal->slug, $modal->name) : '';
+
+        // Brand + Category info
+        $brandSlug = $categorySlug = '';
+        if ($modal) {
+            $brand = DB::table('device_types')->where('id', $modal->device_type_id)->first();
+            if ($brand) {
+                $brandSlug = $this->cleanSlug($brand->slug, $brand->name);
+                $category  = DB::table('categories')->where('id', $brand->category_id)->first();
+                if ($category) {
+                    $categorySlug = $this->cleanSlug($category->slug, $category->name);
+                }
+            }
+        }
+
+        $repairs = DB::table('prices')
+            ->join('repair_types', 'repair_types.id', '=', 'prices.repair_type_id')
+            ->where('prices.modal_id', $modelId)
+            ->where('prices.price', '>', 0)
+            ->whereNotNull('prices.price')
+            ->select('repair_types.id as repair_type_id', 'repair_types.name as repair_name', 'repair_types.slug as repair_slug', 'prices.price')
+            ->orderBy('repair_types.id')
+            ->get()
+            ->map(function ($r) use ($categorySlug, $brandSlug, $modalSlug) {
+
+                $price = (float) $r->price;
+                $rSlug = $this->cleanSlug($r->repair_slug, $r->repair_name);
+
+                if ($price <= 0.015) {
+                    // 0.01 = quotation
+                    $priceType    = 'quotation';
+                    $displayPrice = null;
+                    try {
+                        $url = route('quotation.livewire', ['device' => $brandSlug, 'modal' => $modalSlug, 'repair' => $rSlug]);
+                    } catch (\Exception $e) {
+                        $url = url("quotation/{$brandSlug}/{$modalSlug}/{$rSlug}");
+                    }
+
+                } elseif ($price <= 0.025) {
+                    // 0.02 = free booking
+                    $priceType    = 'free_booking';
+                    $displayPrice = null;
+                    try {
+                        $url = route('free-repair-booking', ['category_slug' => $categorySlug, 'device_slug' => $brandSlug, 'model_slug' => $modalSlug, 'repair_slug' => $rSlug]);
+                    } catch (\Exception $e) {
+                        $url = url("repair/{$categorySlug}/{$brandSlug}/{$modalSlug}/{$rSlug}/free-repair-booking");
+                    }
+
+                } else {
+                    // Real price = instant booking
+                    $priceType    = 'instant';
+                    $displayPrice = $price;
+                    try {
+                        $url = route('repair-detail', ['category_slug' => $categorySlug, 'device_slug' => $brandSlug, 'modal_slug' => $modalSlug, 'repair_slug' => $rSlug]);
+                    } catch (\Exception $e) {
+                        $url = url("repair/{$categorySlug}/{$brandSlug}/{$modalSlug}/{$rSlug}");
+                    }
+                }
+
+                return ['repair_name' => $r->repair_name, 'repair_slug' => $rSlug, 'price' => $displayPrice, 'price_type' => $priceType, 'url' => $url];
+            });
+
+        return response()->json($repairs->values());
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  BUY FLOW — product_specs table se
+    // ═══════════════════════════════════════════════════════════
+
+    /**
+     * GET /chatbot/buy-categories
+     */
+    public function buyCategories(Request $request)
+    {
+        $cats = DB::table('categories')
+            ->whereExists(function ($q) {
+                $q->select(DB::raw(1))
+                  ->from('device_types')
+                  ->whereColumn('device_types.category_id', 'categories.id')
+                  ->where('device_types.service', 'Buy')
+                  ->where('device_types.status', 'Publish')
+                  ->whereNull('device_types.deleted_at');
+            })
+            ->where('status', 'Publish')
+            ->whereNull('deleted_at')
+            ->select('id', 'name', 'slug')
+            ->orderBy('sort_order')
+            ->get()
+            ->map(function ($c) {
+                $c->icon = $this->categoryIcon($c->name);
+                return $c;
+            });
+
+        return response()->json($cats);
+    }
+
+    /**
+     * GET /chatbot/buy-brands?category_id=4
+     */
+    public function buyBrands(Request $request)
+    {
+        $catId = $request->category_id;
+
+        $brands = DB::table('device_types')
+            ->where('category_id', $catId)
+            ->where('service', 'Buy')
+            ->where('status', 'Publish')
+            ->whereNull('deleted_at')
+            ->select('id', 'name', 'slug')
+            ->orderBy('sort_order')
+            ->get()
+            ->map(function ($b) {
+                $b->icon = $this->brandIcon($b->name);
+                return $b;
+            });
+
+        return response()->json($brands);
+    }
+
+    /**
+     * GET /chatbot/buy-models?brand_id=4
+     */
+    public function buyModels(Request $request)
+    {
+        $brandId = $request->brand_id;
+
+        $models = DB::table('modals')
+            ->whereExists(function ($q) {
+                $q->select(DB::raw(1))
+                  ->from('product_specs')
+                  ->whereColumn('product_specs.model_id', 'modals.id')
+                  ->where('product_specs.service', 'Buy')
+                  ->where('product_specs.quantity', '>', 0);
+            })
+            ->where('device_type_id', $brandId)
+            ->where('service', 'Buy')
+            ->where('status', 'Publish')
+            ->whereNull('deleted_at')
+            ->select('id', 'name', 'slug')
+            ->orderBy('order_by')
+            ->orderBy('name')
+            ->get()
+            ->map(function ($m) {
+                $m->slug = $this->cleanSlug($m->slug, $m->name);
+                return $m;
+            });
+
+        return response()->json($models);
+    }
+
+    /**
+     * GET /chatbot/buy-specs?model_id=97
+     * ✅ FIX: URL ab modal slug se banta hai, numeric ID se nahi
+     */
+    public function buySpecs(Request $request)
+    {
+        $modelId = $request->model_id;
+
+        // Model info for URL building
+        $modal     = DB::table('modals')->where('id', $modelId)->first();
+        $modalSlug = $modal ? $this->cleanSlug($modal->slug, $modal->name) : '';
+
+        // Brand slug for URL
+        $brandSlug = '';
+        if ($modal) {
+            $brand = DB::table('device_types')->where('id', $modal->device_type_id)->first();
+            if ($brand) {
+                $brandSlug = $this->cleanSlug($brand->slug, $brand->name);
+            }
+        }
+
+        // product_specs se available variants
+        $specs = DB::table('product_specs')
+            ->where('model_id', $modelId)
+            ->where('service', 'Buy')
+            ->where('quantity', '>', 0)
+            ->whereNotNull('price')
+            ->where('price', '>', 0)
+            ->select(
+                'id',
+                'memory_size',
+                'condition',
+                'color',
+                'grade',
+                'price',
+                'network_unlocked',
+                'account_cleared',
+                'warranty',
+                'image',
+                'ram',
+                'generation',
+                'scree_size',
+                'quantity'
+            )
+            ->orderBy('price', 'asc')
+            ->get()
+            ->map(function ($s) use ($modal, $modalSlug, $brandSlug) {
+
+                // ✅ FIX: modal slug use karo — numeric ID nahi
+                $url = url("guest-buy-product/specs/{$modalSlug}");
+
+                return [
+                    'id'               => $s->id,
+                    'memory_size'      => $s->memory_size      ?? 'N/A',
+                    'condition'        => $s->condition        ?? 'Good',
+                    'color'            => $s->color            ?? '',
+                    'grade'            => $s->grade            ?? '',
+                    'price'            => (float) $s->price,
+                    'network_unlocked' => $s->network_unlocked ? 'Yes' : 'No',
+                    'account_cleared'  => $s->account_cleared  ? 'Yes' : 'No',
+                    'warranty'         => $s->warranty         ?? '',
+                    'image'            => $s->image            ?? '',
+                    'ram'              => $s->ram              ?? '',
+                    'generation'       => $s->generation       ?? '',
+                    'screen_size'      => $s->scree_size       ?? '',
+                    'quantity'         => $s->quantity,
+                    'url'              => $url,
+                    'model_name'       => $modal->name         ?? '',
+                    'model_slug'       => $modalSlug,
+                    'brand_slug'       => $brandSlug,
+                ];
+            });
+
+        return response()->json($specs->values());
+    }
+
+    // ═══════════════════════════════════════════════════════════
+    //  PRIVATE HELPERS
+    // ═══════════════════════════════════════════════════════════
+
+    private function cleanSlug($slug, $fallbackName = '')
+    {
+        $s = rtrim(trim($slug ?? ''), '-');
+        if (empty($s) && !empty($fallbackName)) {
+            $s = Str::slug($fallbackName);
+        }
+        return $s;
+    }
+
+    private function brandIcon($name)
+    {
+        $map = [
+            'apple'      => '🍎', 'samsung'    => '📱', 'google'     => '🔍',
+            'huawei'     => '📱', 'oneplus'    => '🔴', 'motorola'   => '📱',
+            'dell'       => '💻', 'hp'         => '💻', 'lenovo'     => '💻',
+            'asus'       => '💻', 'sony'       => '🎮', 'playstation'=> '🎮',
+            'microsoft'  => '🎮', 'nintendo'   => '🎮', 'xbox'       => '🎮',
+            'amazon'     => '🔥', 'oppo'       => '📱', 'xiaomi'     => '📱',
+            'honor'      => '📱', 'toshiba'    => '💻', 'acer'       => '💻',
+            'razer'      => '💻', 'msi'        => '💻',
+        ];
+        $key = strtolower(explode(' ', trim($name))[0]);
+        return $map[$key] ?? '📱';
+    }
+
+    private function categoryIcon($name)
+    {
+        $n = strtolower($name);
+        if (str_contains($n, 'phone') || str_contains($n, 'mobile'))    return '📱';
+        if (str_contains($n, 'laptop') || str_contains($n, 'computer')) return '💻';
+        if (str_contains($n, 'tablet') || str_contains($n, 'ipad'))     return '📲';
+        if (str_contains($n, 'console') || str_contains($n, 'gaming'))  return '🎮';
+        if (str_contains($n, 'watch'))                                   return '⌚';
+        return '📦';
+    }
+}
